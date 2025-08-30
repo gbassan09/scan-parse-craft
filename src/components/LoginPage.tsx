@@ -29,7 +29,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             <div className="mx-auto w-16 h-16 gradient-primary rounded-full flex items-center justify-center">
               <FileText className="h-8 w-8 text-white" />
             </div>
-            <CardTitle className="text-2xl font-bold gradient-text">
+            <CardTitle className="text-2xl font-bold text-foreground">
               Scan Parse Craft
             </CardTitle>
             <CardDescription className="text-muted-foreground">
