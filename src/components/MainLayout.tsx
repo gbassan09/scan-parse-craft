@@ -11,10 +11,11 @@ import screenshot5 from "@/assets/screenshot-5.jpg";
 import screenshot6 from "@/assets/screenshot-6.jpg";
 
 interface MainLayoutProps {
+  user: any;
   onLogout: () => void;
 }
 
-export default function MainLayout({ onLogout }: MainLayoutProps) {
+export default function MainLayout({ user, onLogout }: MainLayoutProps) {
   const [currentView, setCurrentView] = useState<"home" | "ocr">("home");
 
   const screenshots = [
@@ -84,7 +85,7 @@ export default function MainLayout({ onLogout }: MainLayoutProps) {
 
         {/* OCR Content */}
         <main className="container mx-auto px-4 py-8">
-          <OCRDetector />
+          <OCRDetector user={user} />
         </main>
       </div>
     );
@@ -103,7 +104,7 @@ export default function MainLayout({ onLogout }: MainLayoutProps) {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-white">
                 <User className="h-4 w-4" />
-                <span>Usuário Logado</span>
+                <span>{user.email}</span>
               </div>
               <Button
                 variant="ghost"

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, Upload, AlertCircle, FileText, Copy, Save } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/lib/supabase";
 import Tesseract from "tesseract.js";
 
 interface OCRResult {
@@ -14,7 +15,11 @@ interface OCRResult {
   total: number | null;
 }
 
-export default function OCRDetector() {
+interface OCRDetectorProps {
+  user?: any;
+}
+
+export default function OCRDetector({ user }: OCRDetectorProps) {
   const { toast } = useToast();
   const [imageUrl, setImageUrl] = useState<string>("");
   const [mode, setMode] = useState<"upload" | "webcam">("upload");
@@ -284,6 +289,11 @@ export default function OCRDetector() {
       setOcrResult(recognizedText);
       parseFields(recognizedText);
       
+      // Save to database if user is logged in
+      if (user && currentBlob) {
+        await saveOcrRecord(recognizedText, data.confidence || 0);
+      }
+      
       toast({ 
         title: "OCR concluído", 
         description: `Texto extraído com ${Math.round(data.confidence || 0)}% de confiança. Imagem capturada automaticamente.` 
@@ -301,6 +311,58 @@ export default function OCRDetector() {
       setOcrProgress(0);
     }
   }, [currentBlob, mode, preprocessIfNeeded, toast, downloadImage]);
+
+  const saveOcrRecord = async (extractedText: string, confidence: number) => {
+    if (!user || !currentBlob) return;
+
+    try {
+      // Upload image to Supabase storage
+      const fileName = `ocr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.png`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('ocr-images')
+        .upload(fileName, currentBlob);
+
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
+        return;
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('ocr-images')
+        .getPublicUrl(fileName);
+
+      // Save OCR record to database
+      const { error: dbError } = await supabase
+        .from('ocr_records')
+        .insert({
+          user_id: user.id,
+          image_url: urlData.publicUrl,
+          extracted_text: extractedText,
+          cnpj: extractedFields.cnpj,
+          data: extractedFields.data,
+          total: extractedFields.total,
+          confidence: confidence
+        });
+
+      if (dbError) {
+        console.error('Error saving OCR record:', dbError);
+        toast({
+          title: "Aviso",
+          description: "OCR processado mas não foi possível salvar no histórico",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Registro salvo",
+        description: "OCR processado e salvo no histórico com sucesso"
+      });
+    } catch (error) {
+      console.error('Error in saveOcrRecord:', error);
+    }
+  };
 
   const parseFields = useCallback((text: string) => {
     if (!text) {
