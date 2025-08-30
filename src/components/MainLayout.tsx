@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, FileText, User, Quote, ChevronRight } from "lucide-react";
+import { LogOut, FileText, User, ChevronRight, Monitor } from "lucide-react";
 import OCRDetector from "./OCRDetector";
+import screenshot1 from "@/assets/screenshot-1.jpg";
+import screenshot2 from "@/assets/screenshot-2.jpg";
+import screenshot3 from "@/assets/screenshot-3.jpg";
+import screenshot4 from "@/assets/screenshot-4.jpg";
+import screenshot5 from "@/assets/screenshot-5.jpg";
+import screenshot6 from "@/assets/screenshot-6.jpg";
 
 interface MainLayoutProps {
   onLogout: () => void;
@@ -11,36 +17,36 @@ interface MainLayoutProps {
 export default function MainLayout({ onLogout }: MainLayoutProps) {
   const [currentView, setCurrentView] = useState<"home" | "ocr">("home");
 
-  const testimonials = [
+  const screenshots = [
     {
-      quote: "Sistema muito eficiente para digitalizar notas fiscais.",
-      title: "Gerente Financeiro",
-      subtitle: "Empresa ABC"
+      image: screenshot1,
+      title: "Interface Principal de OCR",
+      description: "Tela de processamento com documento escaneado e resultados extraídos"
     },
     {
-      quote: "Reconhecimento de texto preciso e rápido.",
-      title: "Contador",
-      subtitle: "Escritório XYZ"
+      image: screenshot2,
+      title: "Captura via Webcam",
+      description: "Interface de câmera para digitalização em tempo real"
     },
     {
-      quote: "Interface intuitiva e fácil de usar.",
-      title: "Analista Fiscal",
-      subtitle: "Consultoria 123"
+      image: screenshot3,
+      title: "Dados Extraídos",
+      description: "Visualização organizada dos campos CNPJ, data e valores"
     },
     {
-      quote: "Economia de tempo significativa no processamento.",
-      title: "Diretor Administrativo",
-      subtitle: "Indústria DEF"
+      image: screenshot4,
+      title: "Tela de Login",
+      description: "Interface de autenticação do sistema"
     },
     {
-      quote: "Resultados consistentes e confiáveis.",
-      title: "Assistente Contábil",
-      subtitle: "Holding GHI"
+      image: screenshot5,
+      title: "Upload de Arquivos",
+      description: "Interface para envio e pré-processamento de documentos"
     },
     {
-      quote: "Ferramenta indispensável para automação fiscal.",
-      title: "Coordenador Fiscal",
-      subtitle: "Grupo JKL"
+      image: screenshot6,
+      title: "Progresso do OCR",
+      description: "Acompanhamento em tempo real do processamento"
     }
   ];
 
@@ -137,34 +143,38 @@ export default function MainLayout({ onLogout }: MainLayoutProps) {
       <main className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h3 className="text-3xl font-bold mb-4 gradient-text">
-            O que nossos usuários dizem
+            Capturas de Tela do Sistema
           </h3>
           <p className="text-lg text-muted-foreground">
-            Depoimentos de profissionais que utilizam nossa solução
+            Veja como funciona nossa interface de OCR para notas fiscais
           </p>
         </div>
 
-        {/* Testimonials Grid */}
+        {/* Screenshots Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          {testimonials.map((testimonial, index) => (
+          {screenshots.map((screenshot, index) => (
             <Card 
               key={index}
-              className="shadow-elevated hover:shadow-glow transition-all duration-300 animate-fade-in glass-card"
+              className="shadow-elevated hover:shadow-glow transition-all duration-300 animate-fade-in glass-card overflow-hidden"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <CardHeader>
+              <div className="aspect-video overflow-hidden">
+                <img 
+                  src={screenshot.image} 
+                  alt={screenshot.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <CardHeader className="pb-2">
                 <div className="flex items-start gap-3">
-                  <Quote className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                  <Monitor className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <CardDescription className="text-base italic mb-3">
-                      "{testimonial.quote}"
-                    </CardDescription>
-                    <CardTitle className="text-lg font-semibold">
-                      {testimonial.title}
+                    <CardTitle className="text-lg font-semibold mb-2">
+                      {screenshot.title}
                     </CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      {testimonial.subtitle}
-                    </p>
+                    <CardDescription className="text-sm">
+                      {screenshot.description}
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
